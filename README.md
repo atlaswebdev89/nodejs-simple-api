@@ -12,6 +12,7 @@ Your task is to implement simple CRUD API using in-memory database underneath.
 - Prefer asynchronous API whenever possible
 
 ## Run 
+* git clone https://github.com/doroshuk89/nodejs-simple-api.git .
 * npm install (yarn add) - install packages
 * npm run start:dev - Run in development mode
 * npm run start:prod - Run in production mode
