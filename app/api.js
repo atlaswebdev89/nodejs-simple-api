@@ -1,7 +1,7 @@
 const http = require("http");
 const env = require('dotenv').config();
 const { randomUUID } = require('crypto');
-const  {uuid_valid, validate_post_data }  = require('./validates.js');
+const {uuid_valid, validate_post_data }  = require('./validates.js');
 
 const PORT = process.env.PORT || null;
 if (PORT === null) {
@@ -28,7 +28,7 @@ http.createServer(function(request,response){
                         create_users(request,response);
                         break;
                     // get user from uuid
-                    case ( (request.url.match("/api/users/[a-zA-Z0-9\-]+$")?true:null) && request.method === "GET"):
+                    case ( (request.url.match("/api/users/[a-zA-Z0-9\-]+$")?true:null) && (request.method === "GET" || request.method === "HEAD")):
                         get_user (request,response);
                         break;
                     // edit user data
@@ -37,7 +37,7 @@ http.createServer(function(request,response){
                         break;
                     // delete user
                     case ( (request.url.match("/api/users/[a-zA-Z0-9\-]+$")?true:null) && request.method === "DELETE"):
-                        get_user (request,response);
+                        delete_user (request, response);
                         break;
                     // not found url api
                     default:
@@ -87,7 +87,7 @@ const create_users = (request,response) => {
             process.stdout.write("Status: 201\nResponse: create user success\n")
                 response.writeHead(201);
                 response.write(JSON.stringify(prop));
-                response.end();
+                response.end("\n");
         }catch (err) {
             response.writeHead(JSON.parse(err.message).statusCode);
             response.write(err.message);
@@ -106,7 +106,7 @@ const get_user = (request, response) => {
             process.stdout.write("Status: 200\nResponse: get user success\n");
             response.writeHead(200);
             response.write(JSON.stringify(result));
-            response.end();
+            response.end("\n");
         }else {
             process.stdout.write("Status: 404\nResponse: not found user\n")
             const error = {
@@ -124,4 +124,41 @@ const get_user = (request, response) => {
             }
         throw new Error(JSON.stringify(error));
     }
+}
+
+//delete user
+const delete_user = (request, response) => {
+    const uuid = request.url.split('/').slice(-1).join();
+    const valid = uuid_valid (uuid);
+    
+    if (valid) {
+        // Search item for uuid
+        const indexItem = users.findIndex(item => item.uuid === uuid);
+        if (indexItem != -1) {
+            // delete user
+            const deteleUser = users.splice(indexItem, 1);
+            if (delete_user.length > 0) {
+                process.stdout.write("Status: 204\nResponse: delete user success\n");
+                response.writeHead(204);
+                response.end();
+            }
+        }else {
+            process.stdout.write("Status: 404\nResponse: not found user\n")
+            const error = {
+                statusCode: 404, 
+                message: "Not found users is get UUID"
+            }
+           throw new Error (JSON.stringify(error));
+        }
+
+    }else {
+        process.stdout.write("Status: 400\nResponse: in valid uuid\n")
+            const error = {
+                statusCode: 400, 
+                message: "Get parametr uuid not valid"
+            }
+        throw new Error(JSON.stringify(error));
+    }
+
+
 }
