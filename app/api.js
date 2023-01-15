@@ -33,7 +33,7 @@ http.createServer(function(request,response){
                         break;
                     // edit user data
                     case ( (request.url.match("/api/users/[a-zA-Z0-9\-]+$")?true:null) && request.method === "PUT"):
-                        get_user (request,response);
+                        edit_user (request,response);
                         break;
                     // delete user
                     case ( (request.url.match("/api/users/[a-zA-Z0-9\-]+$")?true:null) && request.method === "DELETE"):
@@ -70,6 +70,7 @@ const get_api_users = (request,response) => {
     response.write(JSON.stringify(users) + "\n");
     response.end();
 }
+
 // create new user (post request)
 const create_users = (request,response) => {
     let body="";
@@ -115,7 +116,6 @@ const get_user = (request, response) => {
             }
            throw new Error (JSON.stringify(error));
         }
-
     }else {
         process.stdout.write("Status: 400\nResponse: in valid uuid\n")
             const error = {
@@ -124,6 +124,66 @@ const get_user = (request, response) => {
             }
         throw new Error(JSON.stringify(error));
     }
+}
+
+// change user
+const edit_user = (request, response) => {
+    // Get body request
+    let body="";
+    request.on('data', (chunk) => {
+        body += (chunk.toString());
+    });
+    request.on("end", () => {
+        try {
+            const prop = validate_post_data(body);
+            // Бросам исключение если полученные json данные не полностью заполнены
+            if( prop.statusCode ) throw new Error(JSON.stringify(prop));
+            
+            const uuid = request.url.split('/').slice(-1).join();
+            const valid = uuid_valid (uuid);
+
+            if (valid) {
+                // Search item for uuid
+                const indexItem = users.findIndex(item => item.uuid === uuid);
+                if (indexItem != -1) {
+                    // change user
+                    prop.uuid = uuid;
+                    const changeUser = users.splice(indexItem, 1, prop);
+                    if (changeUser.length > 0) {
+                        process.stdout.write("Status: 200\nResponse: change user success\n");
+                        response.writeHead(200);
+                        response.write(JSON.stringify(prop));
+                        response.end("\n");
+                    }else {
+                        process.stdout.write("Status: 400\nResponse: change user fail\n");
+                            const error = {
+                                "statusCode": 400,
+                                "message": "Change user data fail!"
+                            }
+                        throw new Error(JSON.stringify(error));
+                    }
+                }else {
+                    process.stdout.write("Status: 404\nResponse: not found user\n")
+                    const error = {
+                        statusCode: 404, 
+                        message: "Not found users is get UUID"
+                    }
+                   throw new Error (JSON.stringify(error));
+                }
+            }else {
+                process.stdout.write("Status: 400\nResponse: in valid uuid\n")
+                    const error = {
+                        statusCode: 400, 
+                        message: "Get parametr uuid not valid"
+                    }
+                throw new Error(JSON.stringify(error));
+            }
+        }catch (err) {
+            response.writeHead(JSON.parse(err.message).statusCode);
+            response.write(err.message);
+            response.end();
+        }
+    })
 }
 
 //delete user
@@ -141,6 +201,13 @@ const delete_user = (request, response) => {
                 process.stdout.write("Status: 204\nResponse: delete user success\n");
                 response.writeHead(204);
                 response.end();
+            }else {
+                process.stdout.write("Status: 400\nResponse: delete user fail\n");
+                    const error = {
+                        "statusCode": 400,
+                        "message": "Delete user data fail!"
+                    }
+                throw new Error(JSON.stringify(error));
             }
         }else {
             process.stdout.write("Status: 404\nResponse: not found user\n")
@@ -150,7 +217,6 @@ const delete_user = (request, response) => {
             }
            throw new Error (JSON.stringify(error));
         }
-
     }else {
         process.stdout.write("Status: 400\nResponse: in valid uuid\n")
             const error = {
@@ -159,6 +225,4 @@ const delete_user = (request, response) => {
             }
         throw new Error(JSON.stringify(error));
     }
-
-
 }
