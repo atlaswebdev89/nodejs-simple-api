@@ -14,44 +14,45 @@ const users = [];
 
 // Api server
 http.createServer(function(request,response){
-    process.stdout.write("\nMethod: "+ request.method + "\nRequest URL: " + request.url + "\n");
-    response.setHeader("Content-Type", "application/json");
-        try {
-                // router 
-                switch(true){
-                    //get all users (get or head request)
-                    case (request.url === '/api/users' && (request.method === "GET" || request.method === "HEAD")):
-                        get_api_users(request,response);
-                        break;
-                    // create new user (post request)
-                    case (request.url === '/api/users' && request.method === "POST"):
-                        create_users(request,response);
-                        break;
-                    // get user from uuid
-                    case ( (request.url.match("/api/users/[a-zA-Z0-9\-]+$")?true:null) && (request.method === "GET" || request.method === "HEAD")):
-                        get_user (request,response);
-                        break;
-                    // edit user data
-                    case ( (request.url.match("/api/users/[a-zA-Z0-9\-]+$")?true:null) && request.method === "PUT"):
-                        edit_user (request,response);
-                        break;
-                    // delete user
-                    case ( (request.url.match("/api/users/[a-zA-Z0-9\-]+$")?true:null) && request.method === "DELETE"):
-                        delete_user (request, response);
-                        break;
-                    // not found url api
-                    default:
-                        endpoints_not_found(response);
-                }
-        }catch(err) {
-            response.writeHead(JSON.parse(err.message).statusCode);
-            response.write(err.message);
-            response.end("\n");
-        }
-}).listen(PORT, "127.0.0.1",()=>{
+        process.stdout.write("\nMethod: "+ request.method + "\nRequest URL: " + request.url + "\n");
+        response.setHeader("Content-Type", "application/json");
+            try {
+                    // router 
+                    switch(true){
+                        //get all users (get or head request)
+                        case (request.url === '/api/users' && (request.method === "GET" || request.method === "HEAD")):
+                            get_api_users(request,response);
+                            break;
+                        // create new user (post request)
+                        case (request.url === '/api/users' && request.method === "POST"):
+                            create_users(request,response);
+                            break;
+                        // get user from uuid
+                        case ( (request.url.match("/api/users/[a-zA-Z0-9\-]+$")?true:null) && (request.method === "GET" || request.method === "HEAD")):
+                            get_user (request,response);
+                            break;
+                        // edit user data
+                        case ( (request.url.match("/api/users/[a-zA-Z0-9\-]+$")?true:null) && request.method === "PUT"):
+                            edit_user (request,response);
+                            break;
+                        // delete user
+                        case ( (request.url.match("/api/users/[a-zA-Z0-9\-]+$")?true:null) && request.method === "DELETE"):
+                            delete_user (request, response);
+                            break;
+                        // not found url api
+                        default:
+                            endpoints_not_found(response);
+                    }
+            }catch(err) {
+                response.writeHead(JSON.parse(err.message).statusCode);
+                response.write(err.message);
+                response.end("\n");
+            }
+}).listen(PORT, "127.0.0.1", ()=>{
     console.log("Start http server!");
     console.log("Сервер начал прослушивание запросов на порту " + PORT);
 });
+
 
 // handler not found endpoint api
 const endpoints_not_found = (response) => {
