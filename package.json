@@ -1,0 +1,35 @@
+{
+  "name": "simple-api",
+  "version": "1.0.0",
+  "description": "simple crud api ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:dev": "npx nodemon app/app.js",
+    "start": "cross-env PORT=5000 npx nodemon  app/app.js",
+    "start:prod": "webpack && node app-bundle/app.min.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/doroshuk89/nodejs-simple-api.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/doroshuk89/nodejs-simple-api/issues"
+  },
+  "homepage": "https://github.com/doroshuk89/nodejs-simple-api#readme",
+  "devDependencies": {
+    "@babel/core": "^7.20.12",
+    "@babel/preset-env": "^7.20.2",
+    "babel-loader": "^9.1.2",
+    "clean-webpack-plugin": "^4.0.0",
+    "cross-env": "^7.0.3",
+    "nodemon": "^2.0.20",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3"
+  }
+}
